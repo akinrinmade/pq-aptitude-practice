@@ -33,13 +33,19 @@ def parse_corpus():
     path = BASE_DIR / "question_bank_corpus.md"
     text = path.read_text(encoding="utf-8")
     entries = []
-    source = "Extracted PDF bank"
-    for index, block in enumerate(re.split(r"(?=^### Question \d+$)", text, flags=re.MULTILINE)):
+    source_headers = list(re.finditer(r"^## (.+)$", text, flags=re.MULTILINE))
+    question_blocks = list(re.finditer(r"^### Question \d+$", text, flags=re.MULTILINE))
+    for index, question_match in enumerate(question_blocks):
+        next_question = question_blocks[index + 1].start() if index + 1 < len(question_blocks) else len(text)
+        block = text[question_match.start():next_question]
         if not block.startswith("### Question"):
             continue
-        source_match = re.search(r"^## (.+)$", text[: text.find(block)], flags=re.MULTILINE)
-        if source_match:
-            source = source_match.group(1)
+        source = "Extracted PDF bank"
+        for source_match in source_headers:
+            if source_match.start() < question_match.start():
+                source = source_match.group(1)
+            else:
+                break
         lines = block.splitlines()
         content = "\n".join(line for line in lines if not line.startswith("### Question") and not line.startswith("Source page:" )).strip()
         option_matches = list(re.finditer(r"(?m)^\s*\(?([A-E])\)?[.)]\s+(.+)$", content))

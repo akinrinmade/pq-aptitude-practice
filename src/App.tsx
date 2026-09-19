@@ -26,7 +26,7 @@ type AttemptRecord = {
   mode: 'Practice' | 'Timed Mock'
 }
 
-const STORAGE_BANK_KEY = 'pq-aptitude-bank-v3'
+const STORAGE_BANK_KEY = 'pq-aptitude-bank-v4'
 const STORAGE_HISTORY_KEY = 'pq-aptitude-history'
 
 const defaultQuestions: Question[] = [
