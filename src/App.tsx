@@ -27,7 +27,7 @@ type AttemptRecord = {
   mode: 'Practice' | 'Timed Mock'
 }
 
-const STORAGE_BANK_KEY = 'pq-aptitude-bank-v5'
+const STORAGE_BANK_KEY = 'pq-aptitude-pdf-bank-v6'
 const STORAGE_HISTORY_KEY = 'pq-aptitude-history'
 
 const defaultQuestions: Question[] = [
@@ -233,7 +233,7 @@ function App() {
   useEffect(() => {
     if (questions.length > defaultQuestions.length) return
 
-    fetch('/question-bank.json')
+    fetch('/pdf-question-bank.json')
       .then((response) => {
         if (!response.ok) throw new Error('Bundled question bank unavailable')
         return response.json() as Promise<Record<string, unknown>[]>
