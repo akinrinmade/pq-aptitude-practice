@@ -3,15 +3,15 @@
 ## Source bank
 
 - PDF-derived source records: 730
-- Verified practice records: 166
-- Held for review: 564
+- Verified practice records: 289
+- Held for review: 441
 
 ## Verified practice rule
 
 An item enters `public/verified-pdf-question-bank.json` only when:
 
 - the prompt is non-empty
-- at least three answer options were extracted
+- at least three answer options were extracted, including True/False/Cannot Say formats
 - the answer index is present in the source material
 - the answer index points to an extracted option
 

@@ -22,11 +22,33 @@ def section_for_source(source):
     return "Logical"
 
 
-def parse_answer(text):
+def parse_answer(text, options):
     match = re.search(r"(?i)(?:correct\s+answer|answer)\s*(?:is|:)\s*\(?([A-E])\)?", text)
     if match:
         return "ABCDE".index(match.group(1).upper())
+    for index, option in enumerate(options):
+        escaped = re.escape(option)
+        if re.search(rf"(?i)(?:^|\n)\s*{escaped}\s*[-:]", text):
+            return index
     return None
+
+
+def parse_options(content, labeled_matches):
+    if labeled_matches:
+        return [match.group(2).strip() for match in labeled_matches][:5]
+
+    lines = [line.strip() for line in content.splitlines() if line.strip()]
+    verbal_options = ["True", "False", "Cannot say"]
+    if all(re.search(rf"(?i)\b{re.escape(option)}\b", content) for option in verbal_options):
+        return verbal_options
+
+    candidates = []
+    for line in lines:
+        if len(line) <= 80 and not re.search(r"[.!?]$", line) and not line.lower().startswith(("source", "solution", "explanation")):
+            candidates.append(line)
+    if len(candidates) >= 5 and re.fullmatch(r"\d+", candidates[-1]):
+        candidates.pop()
+    return candidates[-5:] if len(candidates) >= 5 else candidates[-4:] if len(candidates) >= 4 else []
 
 
 def parse_corpus():
@@ -51,9 +73,17 @@ def parse_corpus():
         source_page = source_page_match.group(1) if source_page_match else ""
         content = "\n".join(line for line in lines if not line.startswith("### Question") and not line.startswith("Source page:" )).strip()
         option_matches = list(re.finditer(r"(?m)^\s*\(?([A-E])\)?[.)]\s+(.+)$", content))
-        options = [match.group(2).strip() for match in option_matches]
-        question_end = option_matches[0].start() if option_matches else len(content)
+        options = parse_options(content, option_matches)
+        if option_matches:
+            question_end = option_matches[0].start()
+        elif options:
+            first_option = re.search(rf"(?im)^\s*{re.escape(options[0])}\s*$", content)
+            question_end = first_option.start() if first_option else content.find(options[0])
+        else:
+            question_end = len(content)
         prompt = content[:question_end].strip()
+        if not prompt:
+            prompt = content.strip()
         if not prompt:
             continue
         entry = {
@@ -62,7 +92,7 @@ def parse_corpus():
             "difficulty": "Medium",
             "prompt": prompt,
             "options": options[:5] or ["Review source item"],
-            "answerIndex": parse_answer(content),
+            "answerIndex": parse_answer(content, options),
             "explanation": f"Source: {source}. This item is preserved from the extracted PDF corpus.",
         }
         if "76284431-SHL" in source and source_page in {"4", "5"}:
