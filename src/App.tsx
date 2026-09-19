@@ -178,7 +178,7 @@ const normalizeImportedQuestion = (raw: Record<string, unknown>, index: number):
 
   return {
     id: String(raw.id ?? `import-${index + 1}`),
-    type: qType in ['Tech', 'Numerical', 'Verbal', 'Logical', 'Abstract'] ? qType : 'Numerical',
+    type: ['Tech', 'Numerical', 'Verbal', 'Logical', 'Abstract'].includes(qType) ? qType : 'Numerical',
     difficulty: qDifficulty === 'easy' ? 'Easy' : qDifficulty === 'hard' ? 'Hard' : 'Medium',
     prompt,
     options: literalOptions.slice(0, 5),
