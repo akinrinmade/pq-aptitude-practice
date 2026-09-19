@@ -7,14 +7,21 @@ OUTPUT = BASE_DIR / "public" / "verified-pdf-question-bank.json"
 
 if __name__ == "__main__":
     questions = json.loads(SOURCE.read_text(encoding="utf-8"))
-    verified = [
-        question for question in questions
-        if question.get("answerIndex") is not None
-        and isinstance(question.get("options"), list)
-        and len(question["options"]) >= 3
-        and question["answerIndex"] < len(question["options"])
-        and question.get("prompt", "").strip()
-    ]
+    verified = []
+    seen_prompts = set()
+    for question in questions:
+        prompt = question.get("prompt", "").strip()
+        normalized_prompt = " ".join(prompt.lower().split())
+        if not prompt or normalized_prompt in seen_prompts:
+            continue
+        if question.get("answerIndex") is None:
+            continue
+        if not isinstance(question.get("options"), list) or len(question["options"]) < 3:
+            continue
+        if question["answerIndex"] < 0 or question["answerIndex"] >= len(question["options"]):
+            continue
+        seen_prompts.add(normalized_prompt)
+        verified.append(question)
     OUTPUT.write_text(json.dumps(verified, ensure_ascii=True, separators=(",", ":")), encoding="utf-8")
     print(f"Source questions: {len(questions)}")
     print(f"Verified practice questions: {len(verified)}")

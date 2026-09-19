@@ -3,8 +3,8 @@
 ## Source bank
 
 - PDF-derived source records: 730
-- Verified practice records: 289
-- Held for review: 441
+- Verified practice records: 279 unique items
+- Held for review: 451
 
 ## Verified practice rule
 
@@ -14,8 +14,11 @@ An item enters `public/verified-pdf-question-bank.json` only when:
 - at least three answer options were extracted, including True/False/Cannot Say formats
 - the answer index is present in the source material
 - the answer index points to an extracted option
+- the normalized prompt is unique within the scored bank
 
 No answer is guessed from the wording, position, or a generated model.
+
+This is a source-integrity gate, not a substitute for expert human validation of every original publisher answer key. A zero-complaint guarantee cannot honestly be made from automated PDF extraction alone, especially where the source PDF contains charts, diagrams, OCR noise, or publisher errors.
 
 ## Held-for-review reasons
 
