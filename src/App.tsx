@@ -229,7 +229,7 @@ function App() {
   }, [questions])
 
   useEffect(() => {
-    if (questions !== defaultQuestions) return
+    if (questions.length > defaultQuestions.length) return
 
     fetch('/question-bank.json')
       .then((response) => {
