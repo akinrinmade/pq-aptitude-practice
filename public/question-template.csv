@@ -1,0 +1,3 @@
+id,type,difficulty,prompt,options,answerIndex,explanation
+sample-1,Numerical,Medium,"A machine produces 240 units in 6 hours. At the same rate, how many units will it produce in 9 hours?","[""300"",""330"",""360"",""420""]",2,"240 divided by 6 is 40 units per hour, so 40 multiplied by 9 is 360."
+sample-2,Logical,Hard,"All analysts are detail-oriented. Some detail-oriented people are not managers. Which conclusion is valid?","[""All analysts are managers"",""Some analysts are managers"",""Some managers are analysts"",""No conclusion follows""]",3,"The premises do not connect analysts to managers, so no valid conclusion can be drawn."
