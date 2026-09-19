@@ -11,6 +11,7 @@ type Question = {
   type: QuestionType
   difficulty: Difficulty
   prompt: string
+  imageUrl?: string
   options: string[]
   answerIndex: number | null
   explanation: string
@@ -181,6 +182,7 @@ const normalizeImportedQuestion = (raw: Record<string, unknown>, index: number):
     type: ['Tech', 'Numerical', 'Verbal', 'Logical', 'Abstract'].includes(qType) ? qType : 'Numerical',
     difficulty: qDifficulty === 'easy' ? 'Easy' : qDifficulty === 'hard' ? 'Hard' : 'Medium',
     prompt,
+    imageUrl: typeof raw.image_url === 'string' ? raw.image_url : undefined,
     options: literalOptions.slice(0, 5),
     answerIndex: answerIndex === null ? null : Math.min(answerIndex, literalOptions.length - 1),
     explanation: String(raw.explanation ?? 'No explanation provided for this item.'),
@@ -205,8 +207,8 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, number | null>>({})
   const [flagged, setFlagged] = useState<Record<string, boolean>>({})
-  const [durationMinutes, setDurationMinutes] = useState(20)
-  const [questionCount, setQuestionCount] = useState(8)
+  const [durationMinutes, setDurationMinutes] = useState(75)
+  const [questionCount, setQuestionCount] = useState(60)
   const [sectionFilter, setSectionFilter] = useState<'Balanced' | QuestionType>('Balanced')
   const [difficultyFilter, setDifficultyFilter] = useState<'Mixed' | Difficulty>('Mixed')
   const [mode, setMode] = useState<'Practice' | 'Timed Mock'>('Timed Mock')
@@ -503,6 +505,7 @@ function App() {
                     <option value={20}>20 minutes</option>
                     <option value={30}>30 minutes</option>
                     <option value={45}>45 minutes</option>
+                    <option value={75}>75 minutes</option>
                   </select>
                 </label>
 
@@ -667,6 +670,13 @@ function App() {
               </div>
 
               <div className="mb-6 rounded-2xl bg-slate-50 p-5">
+                {currentQuestion.imageUrl && (
+                  <img
+                    src={currentQuestion.imageUrl}
+                    alt="Reference data from the source assessment"
+                    className="mb-5 max-h-96 w-full rounded-xl border border-slate-200 bg-white object-contain"
+                  />
+                )}
                 <p className="text-lg font-medium leading-8 text-slate-900">{currentQuestion.prompt}</p>
               </div>
 

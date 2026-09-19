@@ -33,10 +33,13 @@ def main():
     for pdf_path in pdfs:
         document = fitz.open(pdf_path)
         lines.extend([f"## {pdf_path.name}", ""])
-        for page_number, page in enumerate(document, start=1):
-            for block in extract_blocks(clean(page.get_text("text"))):
-                total += 1
-                lines.extend([f"### Question {total}", f"Source page: {page_number}", "", block, ""])
+        page_texts = [clean(page.get_text("text")) for page in document]
+        full_text = "\n\f\n".join(page_texts)
+        for block in extract_blocks(full_text):
+            total += 1
+            question_start = full_text.find(block)
+            source_page = full_text[:question_start].count("\f") + 1
+            lines.extend([f"### Question {total}", f"Source page: {source_page}", "", block, ""])
 
     OUTPUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"PDF files: {len(pdfs)}")

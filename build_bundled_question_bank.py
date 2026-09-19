@@ -47,6 +47,8 @@ def parse_corpus():
             else:
                 break
         lines = block.splitlines()
+        source_page_match = re.search(r"^Source page: (\d+)$", block, flags=re.MULTILINE)
+        source_page = source_page_match.group(1) if source_page_match else ""
         content = "\n".join(line for line in lines if not line.startswith("### Question") and not line.startswith("Source page:" )).strip()
         option_matches = list(re.finditer(r"(?m)^\s*\(?([A-E])\)?[.)]\s+(.+)$", content))
         options = [match.group(2).strip() for match in option_matches]
@@ -54,7 +56,7 @@ def parse_corpus():
         prompt = content[:question_end].strip()
         if not prompt:
             continue
-        entries.append({
+        entry = {
             "id": f"source-{index + 1:04d}",
             "type": section_for_source(source),
             "difficulty": "Medium",
@@ -62,7 +64,10 @@ def parse_corpus():
             "options": options[:5] or ["Review source item"],
             "answerIndex": parse_answer(content),
             "explanation": f"Source: {source}. This item is preserved from the extracted PDF corpus.",
-        })
+        }
+        if "76284431-SHL" in source and source_page in {"4", "5"}:
+            entry["image_url"] = "/source-pages/shl-page-4.png"
+        entries.append(entry)
     return entries
 
 
